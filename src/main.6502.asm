@@ -24,23 +24,20 @@
   STX PPUADDR
   LDX #$00
   STX PPUADDR
-  LDA #$29
+load_palettes:
+  LDA palletes, X
   STA PPUDATA
-  LDA #$19
-  STA PPUDATA
-  LDA #$09
-  STA PPUDATA
-  LDA #$0f
-  STA PPUDATA
+  INX
+  CPX #$20
+  BNE load_palettes
   ; write sprite data
-  LDA #$70
-  STA $0200       ; Y-coord of first sprite
-  LDA #$05
-  STA $0201       ; tile number of first sprite
-  LDA #$00
-  STA $0202       ; attributes of first sprite
-  LDA #$80
-  STA $0203       ; X-coord of first sprite
+  LDX #$00
+load_sprites:
+  LDA sprites, X
+  STA $0200, X
+  INX
+  CPX #$10
+  BNE load_sprites
 vblankvait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
   BPL vblankvait
@@ -57,3 +54,19 @@ forever:
 
 .segment "CHR"
 .incbin "content/graphics.chr"
+
+.segment "RODATA"
+palletes:
+.byte $29, $19, $09, $0f
+.byte $29, $19, $09, $0f
+.byte $29, $19, $09, $0f
+.byte $29, $19, $09, $0f
+.byte $29, $19, $09, $0f
+.byte $29, $11, $01, $0f
+.byte $29, $10, $00, $0f
+.byte $29, $16, $06, $0f
+sprites:
+.byte $70, $05, $00, $80
+.byte $70, $06, $00, $88
+.byte $78, $07, $00, $80
+.byte $78, $08, $00, $88
