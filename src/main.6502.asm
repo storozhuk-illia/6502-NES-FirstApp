@@ -11,6 +11,9 @@
   STA OAMADDR
   LDA #$02
   STA OAMDMA
+  LDA #$00
+  STA $2005 ; ??
+  STA $2005 ; ??
   RTI
 .endproc
 
@@ -30,6 +33,7 @@ load_palettes:
   INX
   CPX #$20
   BNE load_palettes
+  
   ; write sprite data
   LDX #$00
 load_sprites:
@@ -38,13 +42,148 @@ load_sprites:
   INX
   CPX #$10
   BNE load_sprites
+  
+  ; write nametables
+  ; big star
+  LDX #$2f
+
+  LDA PPUSTATUS
+  LDA #$20
+  STA PPUADDR
+  LDA #$6b
+  STA PPUADDR
+  STX PPUDATA
+
+  LDA PPUSTATUS
+  LDA #$21
+  STA PPUADDR
+  LDA #$57
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$22
+  STA PPUADDR
+  LDA #$23
+  STA PPUADDR
+  STX PPUDATA
+
+  LDA PPUSTATUS
+  LDA #$23
+  STA PPUADDR
+  LDA #$52
+  STA PPUADDR
+  STX PPUDATA
+  
+  ; small star 1
+  LDX #$2d
+  
+  LDA PPUSTATUS
+  LDA #$20
+  STA PPUADDR
+  LDA #$74
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$21
+  STA PPUADDR
+  LDA #$43
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$21
+  STA PPUADDR
+  LDA #$5d
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$21
+  STA PPUADDR
+  LDA #$73
+  STA PPUADDR
+  STX PPUDATA
+
+  LDA PPUSTATUS
+  LDA #$22
+  STA PPUADDR
+  LDA #$2f
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$22
+  STA PPUADDR
+  LDA #$f7
+  STA PPUADDR
+  STX PPUDATA
+  
+  ; small star 2
+  LDX #$2e
+  
+  LDA PPUSTATUS
+  LDA #$20
+  STA PPUADDR
+  LDA #$f1
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$21
+  STA PPUADDR
+  LDA #$a8
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$22
+  STA PPUADDR
+  LDA #$7a
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$23
+  STA PPUADDR
+  LDA #$44
+  STA PPUADDR
+  STX PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$23
+  STA PPUADDR
+  LDA #$7c
+  STA PPUADDR
+  STX PPUDATA
+
+  ; attribute table
+  LDA PPUSTATUS
+  LDA #$23
+  STA PPUADDR
+  LDA #$c2
+  STA PPUADDR
+  LDA #%01000000
+  STA PPUDATA
+  
+  LDA PPUSTATUS
+  LDA #$23
+  STA PPUADDR
+  LDA #$e0
+  STA PPUADDR
+  LDA #%00001100
+  STA PPUDATA
+  
 vblankvait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
   BPL vblankvait
-  LDA #%10010000  ; turn on NMIs, prites use first pattern table
+  
+  LDA #%10010000  ; turn on NMIs, sprites use first pattern table
   STA PPUCTRL
   LDA #%00011110  ; turn on screen
   STA PPUMASK
+  
 forever:
   JMP forever
 .endproc
@@ -52,21 +191,23 @@ forever:
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
 
-.segment "CHR"
-.incbin "content/graphics.chr"
-
 .segment "RODATA"
 palletes:
-.byte $29, $19, $09, $0f
-.byte $29, $19, $09, $0f
-.byte $29, $19, $09, $0f
-.byte $29, $19, $09, $0f
-.byte $29, $19, $09, $0f
-.byte $29, $11, $01, $0f
-.byte $29, $10, $00, $0f
-.byte $29, $16, $06, $0f
+.byte $0f, $12, $23, $27
+.byte $0f, $2b, $3c, $39
+.byte $0f, $0c, $07, $13
+.byte $0f, $19, $09, $29
+
+.byte $0f, $2d, $10, $15
+.byte $0f, $19, $09, $29
+.byte $0f, $19, $09, $29
+.byte $0f, $19, $09, $29
+
 sprites:
 .byte $70, $05, $00, $80
 .byte $70, $06, $00, $88
 .byte $78, $07, $00, $80
 .byte $78, $08, $00, $88
+
+.segment "CHR"
+.incbin "content/starfield.chr"
