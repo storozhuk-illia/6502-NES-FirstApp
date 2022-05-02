@@ -23,6 +23,15 @@ vblankwait:
 .endproc
 
 .proc main
+  LDX $2002
+  LDX #$3f
+  STX $2006
+  LDX #$00
+  STX $2006
+  LDA #$29
+  STA $2007
+  LDA #%00011110
+  STA $2001
 forever:
   JMP forever
 .endproc
