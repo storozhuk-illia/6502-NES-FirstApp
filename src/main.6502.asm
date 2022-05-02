@@ -1,5 +1,5 @@
-.segment "HEADER"
-.byte $4e, $45, $53, $1a, $02, $01, $00, $00
+.include "constants.inc"
+.include "header.inc"
 
 .segment "CODE"
 .proc irq_handler
@@ -10,28 +10,19 @@
   RTI
 .endproc
 
-.proc reset_handler
-  SEI
-  CLD
-  LDX #$00
-  STX $2000
-  STX $2001
-vblankwait:
-  BIT $2002
-  BPL vblankwait
-  JMP main
-.endproc
+.import reset_handler
 
+.export main
 .proc main
-  LDX $2002
+  LDX PPUSTATUS
   LDX #$3f
-  STX $2006
+  STX PPUADDR
   LDX #$00
-  STX $2006
+  STX PPUADDR
   LDA #$29
-  STA $2007
+  STA PPUDATA
   LDA #%00011110
-  STA $2001
+  STA PPUMASK
 forever:
   JMP forever
 .endproc
@@ -39,7 +30,5 @@ forever:
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
 
-.segment "CHARS"
+.segment "CHR"
 .res 8192
-
-.segment "STARTUP"
