@@ -1,5 +1,8 @@
 .include "constants.inc"
 
+.segment "ZEROPAGE"
+.importzp player_ship_x, player_ship_y
+
 .segment "CODE"
 .import main
 
@@ -13,5 +16,12 @@
 vblankwait:
   BIT PPUSTATUS
   BPL vblankwait
+
+  ; initialize zero-page values
+  LDA #190
+  STA player_ship_y
+  LDA #120
+  STA player_ship_x
+
   JMP main
 .endproc
